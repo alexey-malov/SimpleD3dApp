@@ -48,6 +48,7 @@ void CChildView::OnPaint()
 	CPaintDC dc(this); // device context for painting
 	
 	// TODO: Add your message handler code here
+	dc.Ellipse(100, 100, 150, 125);
 	
 	// Do not call CWnd::OnPaint() for painting messages
 }
