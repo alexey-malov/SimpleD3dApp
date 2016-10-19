@@ -36,10 +36,16 @@ private:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	void InitD3D();
+
+	CComPtr<ID3D10RenderTargetView> CreateRenderTargetView();
+
+	CComPtr<IDXGISwapChain> CreateSwapChain();
+
 	CComPtr<ID3D10Device1>  CreateDevice();
 
 	CComPtr<IDXGIFactory1> m_dxgiFactory;
 	CComPtr<ID3D10Device1> m_device;
 	CComPtr<IDXGISwapChain> m_swapChain;
+	CComPtr<ID3D10RenderTargetView> m_currentRenderTargetView;
 };
 

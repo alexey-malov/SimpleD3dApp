@@ -48,6 +48,8 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 void CChildView::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
+	FLOAT clearColor[4] = {0.5f, 0.5f, 0.1f, 1.0f};
+	m_device->ClearRenderTargetView(m_currentRenderTargetView, clearColor);
 
 	m_swapChain->Present(1, 0);
 }
@@ -77,6 +79,24 @@ void CChildView::InitD3D()
 	
 	m_device = CreateDevice();
 	ATLENSURE(m_device != nullptr);
+
+	m_swapChain = CreateSwapChain();
+	m_currentRenderTargetView = CreateRenderTargetView();
+
+
+}
+
+CComPtr<ID3D10RenderTargetView> CChildView::CreateRenderTargetView()
+{
+	CComPtr<ID3D10Texture2D> backBuffer;
+	ATLENSURE_SUCCEEDED(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
+	CComPtr<ID3D10RenderTargetView> renderTargetView;
+	ATLENSURE_SUCCEEDED(m_device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView));
+	return renderTargetView;
+}
+
+CComPtr<IDXGISwapChain> CChildView::CreateSwapChain()
+{
 	DXGI_SWAP_CHAIN_DESC desc = {};
 	desc.BufferCount = 1;
 	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -85,8 +105,10 @@ void CChildView::InitD3D()
 	desc.SampleDesc.Count = 1; // no multisampling
 	desc.SampleDesc.Quality = 0; // default quality
 	desc.Windowed = TRUE;
-	ATLENSURE_SUCCEEDED(m_dxgiFactory->CreateSwapChain(m_device, &desc, &m_swapChain));
-	
+
+	CComPtr<IDXGISwapChain> swapChain;
+	ATLENSURE_SUCCEEDED(m_dxgiFactory->CreateSwapChain(m_device, &desc, &swapChain));
+	return swapChain;
 }
 
 // Создание первого устройства, которое бы поддерживало требуемый набор фич
