@@ -66,4 +66,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\SimpleVertexShader.hlsl" />
+  </ItemGroup>
 </Project>

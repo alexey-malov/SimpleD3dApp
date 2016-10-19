@@ -37,6 +37,8 @@ private:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	void InitD3D();
 
+	CComPtr<ID3D10Buffer> CreateVertexBuffer();
+
 	CComPtr<ID3D10RenderTargetView> CreateRenderTargetView();
 
 	CComPtr<IDXGISwapChain> CreateSwapChain();

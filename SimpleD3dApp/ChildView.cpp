@@ -5,6 +5,11 @@
 #include "stdafx.h"
 #include "SimpleD3dApp.h"
 #include "ChildView.h"
+#ifdef NDEBUG
+#include "shaders/Release/SimpleVertexShader.h"
+#else
+#include "shaders/Debug/SimpleVertexShader.h"
+#endif
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -71,6 +76,11 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+struct VertexInfo
+{
+	float x, y, z;
+};
+
 void CChildView::InitD3D()
 {
 	ATLENSURE_SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory)));
@@ -83,7 +93,33 @@ void CChildView::InitD3D()
 	m_swapChain = CreateSwapChain();
 	m_currentRenderTargetView = CreateRenderTargetView();
 
+	CreateVertexBuffer();
 
+}
+
+CComPtr<ID3D10Buffer> CChildView::CreateVertexBuffer()
+{
+	static const VertexInfo vertices[] = {
+		{ -0.5f, -0.5f, 0.0f },
+		{ +0.5f, -0.5f, 0.0f },
+		{ +0.0f, +0.5f, 0.0f },
+	};
+	D3D10_INPUT_ELEMENT_DESC vertexBufferDesc[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D10_APPEND_ALIGNED_ELEMENT, D3D10_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	D3D10_BUFFER_DESC desc{};
+	desc.ByteWidth = sizeof(vertices);
+	desc.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+
+	CComPtr<ID3D10Buffer> buffer;
+	ATLENSURE_SUCCEEDED(m_device->CreateBuffer(&desc, nullptr, &buffer));
+
+
+	CComPtr<ID3D10InputLayout> inputLayout;
+	m_device->CreateInputLayout(vertexBufferDesc, 1, g_main, sizeof(g_main), &inputLayout);
+
+	return buffer;
 }
 
 CComPtr<ID3D10RenderTargetView> CChildView::CreateRenderTargetView()
