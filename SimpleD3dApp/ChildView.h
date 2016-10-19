@@ -32,5 +32,12 @@ public:
 protected:
 	afx_msg void OnPaint();
 	DECLARE_MESSAGE_MAP()
+private:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	void InitD3D();
+	CComPtr<ID3D10Device1>  CreateDevice();
+
+	CComPtr<IDXGIFactory1> m_dxgiFactory;
+	CComPtr<ID3D10Device1> m_device;
 };
 
