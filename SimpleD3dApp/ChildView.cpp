@@ -25,6 +25,7 @@ CChildView::~CChildView()
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
 	ON_WM_CREATE()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -47,11 +48,8 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 void CChildView::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
-	
-	// TODO: Add your message handler code here
-	dc.Ellipse(100, 100, 150, 125);
-	
-	// Do not call CWnd::OnPaint() for painting messages
+
+	m_swapChain->Present(1, 0);
 }
 
 int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -79,9 +77,19 @@ void CChildView::InitD3D()
 	
 	m_device = CreateDevice();
 	ATLENSURE(m_device != nullptr);
+	DXGI_SWAP_CHAIN_DESC desc = {};
+	desc.BufferCount = 1;
+	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	desc.OutputWindow = m_hWnd;
+	desc.SampleDesc.Count = 1; // no multisampling
+	desc.SampleDesc.Quality = 0; // default quality
+	desc.Windowed = TRUE;
+	ATLENSURE_SUCCEEDED(m_dxgiFactory->CreateSwapChain(m_device, &desc, &m_swapChain));
 	
 }
 
+// Создание первого устройства, которое бы поддерживало требуемый набор фич
 CComPtr<ID3D10Device1> CChildView::CreateDevice()
 {
 	CComPtr<IDXGIAdapter> adapter;
@@ -118,4 +126,11 @@ CComPtr<ID3D10Device1> CChildView::CreateDevice()
 		adapter.Release();
 	}
 	return nullptr;
+}
+
+
+BOOL CChildView::OnEraseBkgnd(CDC* /*pDC*/)
+{
+	// мы уже сами "очистили фон"
+	return TRUE;
 }
